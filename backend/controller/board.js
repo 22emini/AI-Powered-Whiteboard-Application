@@ -1,7 +1,7 @@
 import { prisma } from "../src/config/db.js";
 
 // TEMP: replace with the logged-in user once auth exists
-const TEMP_USER_ID = process.env.TEMP_USER_ID;
+// const TEMP_USER_ID = process.env.TEMP_USER_ID;
 export const  GetAllBoards = async (req,res)=>{
 
 

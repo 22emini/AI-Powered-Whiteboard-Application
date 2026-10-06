@@ -4,7 +4,7 @@ import cors from "cors";
 import { prisma } from "./src/config/db.js";
 dotenv.config()
 import boardsRouter from "./routes/boardRoutes.js";
-
+import authRoutes from "./routes/UserAuthRoute.js";
 
 const app = express();
 const PORT= process.env.PORT || 5000;
@@ -40,6 +40,8 @@ app.get("/db-test", async (req, res) => {
 });
 
 app.use("/api/boards", boardsRouter);
+app.use("/api/auth", authRoutes);
+
 app.listen(PORT, () => {
     console.log(`server is running on  http://localhost:${PORT}`);
 })  

@@ -23,12 +23,20 @@ The application is built on modern web technologies, specifically utilizing a mo
 ### Backend & Real-Time Layer
 *   **Node.js & Express:** Handles the core API routing and server logic.
 *   **Socket.IO:** Powers the real-time, low-latency collaboration features (live cursors, real-time drawing sync).
+*   **Zod:** Installed for request validation if needed later (current routes use simple manual checks).
 
-### Database, Storage, and Authentication (Neon Ecosystem)
-The entire backend infrastructure leverages **Neon**:
-*   **Neon Postgres:** Manages the relational data.
-*   **Neon Auth:** Handles secure user login and authentication.
+### Database, Storage, and Authentication
+The backend uses **Neon** for hosting:
+*   **Neon Postgres:** Manages the relational data, accessed through **Prisma 7** (with the `pg` driver adapter).
+*   **Authentication:** Implemented by the developer (approach to be decided). Until then, boards are owned by a temporary test user (`TEMP_USER_ID`).
 *   **Neon Object Storage:** Stores and serves user-uploaded images and assets.
+
+### Data Model
+*   **User**, **Board**, **Element** (type, x, y, JSON `data`), and **BoardMember** (role per user per board).
+
+### Development Notes
+*   The backend is written by hand as a learning project, with the AI assistant used only for guidance and explanations.
+*   Prisma 7 generates TypeScript, so the server runs with `tsx` and `npx prisma generate` must be run manually after schema changes.
 
 ### Artificial Intelligence
 *   **Google Gemini:** The AI engine driving all generative features on the whiteboard (sticky notes, flowcharts, data-to-chart conversions).
