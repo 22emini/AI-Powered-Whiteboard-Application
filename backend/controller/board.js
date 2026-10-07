@@ -1,14 +1,13 @@
 import { prisma } from "../src/config/db.js";
 
-// TEMP: replace with the logged-in user once auth exists
-// const TEMP_USER_ID = process.env.TEMP_USER_ID;
+
 export const  GetAllBoards = async (req,res)=>{
 
 
     try {
 
+const result = await prisma.board.findMany({ where: { ownerId: req.userId } });
 
-        const  result = await prisma.board.findMany();
 
         res.status(200).json({message:"Success",result:result});
         
@@ -31,11 +30,12 @@ if(!title){
 }
 
 const add = await prisma.board.create({
- data: { title: title, ownerId: TEMP_USER_ID },
+ data: { title: title, ownerId: req.userId },
 })
 res.status(201).json({message:"Success, board data has been created",result:add});
 
 } catch (error){
+    console.log(error);
     res.status(500).json({message:"THere an issue in Creating the board"})
 }
     }
@@ -43,10 +43,11 @@ res.status(201).json({message:"Success, board data has been created",result:add}
 
 export const GetById = async (req,res)=>{
      try {
-        const board = await prisma.board.findUnique({
-            where: { id: req.params.id },
-            include: { elements: true },
-        });
+    const board = await prisma.board.findFirst({
+    where: { id: req.params.id, ownerId: req.userId },
+    include: { elements: true },
+});
+
         if (!board) {
             return res.status(404).json({ error: "Board not found" });
         }
@@ -63,11 +64,15 @@ export const UpdateBoard = async (req,res)=>{
         if (!title) {
             return res.status(400).json({ error: "Title is required" });
         }
-        const board = await prisma.board.update({
-            where: { id: req.params.id },
-            data: { title: title },
-        });
-        res.json(board);
+      const result = await prisma.board.updateMany({
+    where: { id: req.params.id, ownerId: req.userId },
+    data: { title: title },
+});
+if (result.count === 0) {
+    return res.status(404).json({ message: "Board not found" });
+}
+res.json({ message: "Board updated" });
+;
     } catch (error) {
         if (error.code === "P2025") {
             return res.status(404).json({ error: "Board not found" });
@@ -80,8 +85,14 @@ export const UpdateBoard = async (req,res)=>{
 
 export const DeleteBoard = async (req,res)=>{
       try {
-        await prisma.board.delete({ where: { id: req.params.id } });
-        res.status(204).send();
+   const result = await prisma.board.deleteMany({
+    where: { id: req.params.id, ownerId: req.userId },
+});
+if (result.count === 0) {
+    return res.status(404).json({ message: "Board not found" });
+}
+res.status(204).send();
+
     } catch (error) {
         if (error.code === "P2025") {
             return res.status(404).json({ error: "Board not found" });

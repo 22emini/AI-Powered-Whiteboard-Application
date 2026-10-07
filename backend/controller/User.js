@@ -5,27 +5,29 @@ import jwt from "jsonwebtoken";
 
 
 const makeToken = (userId) => {
-    return jwt.sign({ userId: userId }, process.env.JWT_SECRET, { expiresIn: "1d" });
+    return jwt.sign({ userId: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
 
 // user sign up
 
 export const  SignUp = async (req,res) =>{
-    const { email, name, password } = req.body;
+    const { email, name, password, age, phone, job } = req.body;
 
     try{
-
-
-        if( !email || !password  ){
+         if( !email || !password  ){
             res.status(400).json({message:"Please Enter email and password"})
             return;
 
         } 
 
         if(password.length < 8){
-          return  res.status(400).json({message:"Please Enter the Password Length Greater Than 6"});
+          return  res.status(400).json({message:"Please Enter the Password Length Greater Than 8"});
           
         }
+     if (phone && (phone.length < 7 || phone.length > 11)) {
+    return res.status(400).json({ message: "Please Enter the Valid Phone Number" });
+}
+
         const check = await prisma.user.findUnique({
             where:{
                 email:email
@@ -40,7 +42,10 @@ const passwordHash= await bcrypt.hash(password,10)
         data:{
             email:email,
             name:name,
-       passwordHash: passwordHash
+       passwordHash: passwordHash,
+       age:age,
+       phone:phone,
+       job:job,
         }
     })
     res.status(201).json({
