@@ -2,6 +2,9 @@ import { prisma } from "../src/config/db.js";
 import { getBoardRole, canView, canEdit } from "../utils/boardAccess.js";
 import { emitToBoard } from "../src/config/socket.js";
 import { askGemini, AI_MODES } from "../service/gemini.js";
+import { generatePollinationsImage } from "../service/pollinations.js";
+
+const ALL_MODES = [...AI_MODES, "image"];
 
 const COLORS = ["yellow", "pink", "green", "blue", "orange"];
 
@@ -48,7 +51,7 @@ const chartToElements = (ai, startX, startY) => {
 // ---- the endpoint ----
 
 // POST /api/boards/:boardId/ai/generate
-// body: { mode: "sticky_notes" | "flowchart" | "chart", prompt: "...", x?, y? }
+// body: { mode: "sticky_notes" | "flowchart" | "chart" | "image", prompt: "...", x?, y? }
 export const GenerateWithAI = async (req, res) => {
     try {
         const { boardId } = req.params;
@@ -56,8 +59,8 @@ export const GenerateWithAI = async (req, res) => {
         const startX = Number.isFinite(req.body.x) ? req.body.x : 100;
         const startY = Number.isFinite(req.body.y) ? req.body.y : 100;
 
-        if (!AI_MODES.includes(mode)) {
-            return res.status(400).json({ message: `mode must be one of: ${AI_MODES.join(", ")}` });
+        if (!ALL_MODES.includes(mode)) {
+            return res.status(400).json({ message: `mode must be one of: ${ALL_MODES.join(", ")}` });
         }
         if (!prompt || typeof prompt !== "string" || prompt.length > 1000) {
             return res.status(400).json({ message: "prompt is required (max 1000 characters)" });
@@ -71,9 +74,22 @@ export const GenerateWithAI = async (req, res) => {
             return res.status(403).json({ message: "You have view-only access" });
         }
 
-        const ai = await askGemini(mode, prompt);
-
         let created;
+
+        if (mode === "image") {
+            const imgData = await generatePollinationsImage(req, prompt);
+            const el = await prisma.element.create({
+                data: {
+                    boardId,
+                    type: "image",
+                    x: startX,
+                    y: startY,
+                    data: imgData,
+                },
+            });
+            created = [el];
+        } else {
+            const ai = await askGemini(mode, prompt);
 
         if (mode === "flowchart") {
             if (!Array.isArray(ai.nodes) || ai.nodes.length === 0) {
@@ -138,17 +154,18 @@ export const GenerateWithAI = async (req, res) => {
                 items.map((item) => prisma.element.create({ data: { boardId, ...item } }))
             );
         }
+        }
 
         emitToBoard(boardId, "elements:created", created);
         res.status(201).json({ message: "Generated", mode, result: created });
     } catch (error) {
-        console.log(error);
-        if (error.status === 503) {
+        console.error("AI Generation error:", error);
+        if (error.isMissingKey) {
             return res.status(503).json({ message: "AI is not configured on the server" });
         }
-        if (error.status === 502) {
-            return res.status(502).json({ message: error.message });
+        if (error.status === 502 || error.status === 503) {
+            return res.status(error.status).json({ message: error.message || "AI service temporarily unavailable" });
         }
-        res.status(500).json({ message: "Could not generate content" });
+        res.status(500).json({ message: error.message || "Could not generate content" });
     }
 };

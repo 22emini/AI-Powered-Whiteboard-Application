@@ -6,16 +6,17 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsx server.js",
-    "dev": "tsx watch server.js"
+    "dev": "tsx watch server.js",
+    "build": "prisma generate --config prisma7.config.ts",
+    "postinstall": "prisma generate --config prisma7.config.ts",
+    "migrate": "prisma migrate deploy --config prisma7.config.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "nodemon": "^3.1.14",
-    "prisma": "^7.10.0",
-    "tsx": "^4.23.15"
+    "nodemon": "^3.1.14"
   },
   "dependencies": {
     "@google/genai": "^2.27.0",
@@ -30,7 +31,12 @@
     "multer": "^2.4.0",
     "nodemailer": "^10.0.16",
     "pg": "^8.23.1",
+    "prisma": "^7.10.0",
     "socket.io": "^4.8.4",
+    "tsx": "^4.23.15",
     "zod": "^4.6.5"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

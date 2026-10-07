@@ -9,6 +9,7 @@ const MODES = [
   { id: "sticky_notes", label: "Sticky notes", chips: ["Ideas for a product launch", "Pros and cons of remote work", "Team retrospective topics"] },
   { id: "flowchart", label: "Flowchart", chips: ["User signup flow", "Bug triage process", "Order fulfillment steps"] },
   { id: "chart", label: "Chart", chips: ["Quarterly revenue for a startup", "Market share of smartphone brands", "Weekly study hours"] },
+  { id: "image", label: "Image", chips: ["Futuristic robot drawing on a whiteboard", "Minimalist icon of an idea lightbulb", "Cute cat coding at night, vector style", "3D cloud computing architecture icon"] },
 ];
 
 export function AIPanel({ boardId, center, onCreated, onClose }: {

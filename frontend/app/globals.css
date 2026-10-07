@@ -216,7 +216,7 @@ textarea.input { height: auto; padding: 12px 14px; resize: vertical; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 14px; }
 .chip { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 5px 10px; font-size: 12px; }
 .chip:hover { background: var(--green-100); }
-.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 10px 0; }
+.seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 10px 0; }
 .seg button { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 8px 4px; font-size: 12px; font-weight: 600; }
 .seg button.on { background: var(--green-800); color: #fff; border-color: var(--green-800); }
 .member { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
@@ -225,3 +225,15 @@ textarea.input { height: auto; padding: 12px 14px; resize: vertical; }
 .emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
 .emoji-grid button { font-size: 24px; background: transparent; border: 0; border-radius: 8px; padding: 4px; }
 .emoji-grid button:hover { background: #eef0f5; }
+
+/* SEO & Content Section enhancements */
+.faq-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+.faq-item { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 18px 22px; transition: border-color .15s; }
+.faq-item:hover { border-color: var(--green-600); }
+.faq-item summary { font-family: var(--font-heading); font-weight: 600; font-size: 16px; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: "+"; font-size: 20px; font-weight: 400; color: var(--muted); }
+.faq-item[open] summary::after { content: "−"; }
+.faq-item p { margin-top: 10px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+

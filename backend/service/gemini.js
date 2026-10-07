@@ -1,7 +1,11 @@
 import { GoogleGenAI } from "@google/genai";
 
 // Model is configurable: GEMINI_MODEL in .env (default below)
-const getModel = () => process.env.GEMINI_MODEL || "gemini-3.5-flash";
+const DEFAULT_MODELS = [
+    process.env.GEMINI_MODEL,
+    "gemini-3.5-flash-lite",
+    "gemini-3.8-flash",
+].filter(Boolean);
 
 const PROMPTS = {
     sticky_notes: (userPrompt) => `
@@ -26,23 +30,41 @@ labels and values must have the same length (max 12). Values must be numbers.`,
 export const AI_MODES = Object.keys(PROMPTS);
 
 // Asks Gemini for JSON and returns it parsed.
-// Throws an Error with .status = 503 (not configured) or 502 (bad AI output).
 export const askGemini = async (mode, userPrompt) => {
     if (!process.env.GEMINI_API_KEY) {
         const error = new Error("GEMINI_API_KEY is not set");
+        error.isMissingKey = true;
         error.status = 503;
         throw error;
     }
 
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-    const response = await ai.models.generateContent({
-        model: getModel(),
-        contents: PROMPTS[mode](userPrompt),
-        config: { responseMimeType: "application/json" },
-    });
+    let lastError = null;
+    let response = null;
 
-    let text = (response.text || "").trim();
+    // Try models in order to prevent outages when a specific model experiences high demand
+    for (const model of DEFAULT_MODELS) {
+        try {
+            response = await ai.models.generateContent({
+                model,
+                contents: PROMPTS[mode](userPrompt),
+                config: { responseMimeType: "application/json" },
+            });
+            if (response?.text) break;
+        } catch (err) {
+            console.warn(`Gemini model ${model} failed:`, err.message || err);
+            lastError = err;
+        }
+    }
+
+    if (!response || !response.text) {
+        const err = new Error(lastError?.message || "All AI models are currently busy, please try again in a few moments");
+        err.status = lastError?.status || 503;
+        throw err;
+    }
+
+    let text = response.text.trim();
     // some models still wrap JSON in ```json fences
     text = text.replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
 

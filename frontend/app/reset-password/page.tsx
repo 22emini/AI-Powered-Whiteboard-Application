@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { ResetPasswordForm } from "@/components/ResetPasswordForm";
 
-export const metadata: Metadata = { title: "Reset password — Blank Canvas" };
+export const metadata: Metadata = {
+  title: "Reset Password",
+  description: "Set a new password for your Blank Canvas account.",
+  robots: { index: false, follow: false },
+};
 
 export default function Page() {
   return <ResetPasswordForm />;

@@ -7,8 +7,17 @@ let io = null;
 const roomName = (boardId) => `board:${boardId}`;
 
 export const initSocket = (httpServer) => {
+    const rawOrigin = process.env.FRONTEND_URL;
+    const origins = rawOrigin
+        ? rawOrigin.split(",").map((s) => s.trim().replace(/\/$/, ""))
+        : "*";
+
     io = new Server(httpServer, {
-        cors: { origin: process.env.FRONTEND_URL || "*" },
+        cors: {
+            origin: origins.length === 1 ? origins[0] : origins,
+            methods: ["GET", "POST"],
+            credentials: true,
+        },
     });
 
     // Every socket must present a valid JWT: io({ auth: { token } })
