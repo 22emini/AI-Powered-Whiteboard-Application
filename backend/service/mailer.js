@@ -28,33 +28,37 @@ export async function sendPasswordResetEmail(to, link) {
   <p style="color:#666;font-size:13px">If you didn't ask for this, you can ignore this email.</p>
 </div>`;
 
-    // 1. If RESEND_API_KEY is configured, use Resend HTTP API (recommended for Render free tier where SMTP is blocked)
+    // 1. If RESEND_API_KEY is configured, try Resend HTTP API
     if (process.env.RESEND_API_KEY) {
-        const configuredFrom = process.env.RESEND_FROM || process.env.MAIL_FROM || "";
-        // Resend cannot send from public free email domains (gmail, yahoo, etc.) without DNS domain ownership verification.
-        const isPublicDomain = /@(gmail|yahoo|hotmail|outlook)\.com/i.test(configuredFrom);
-        const from = (!configuredFrom || isPublicDomain) ? "Syntheboard <onboarding@resend.dev>" : configuredFrom;
-        const res = await fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                from,
-                to: [to],
-                subject: "Reset your Syntheboard password",
-                html,
-                text: `We received a request to reset your password.\n\nOpen this link (valid for 1 hour):\n${link}\n\nIf you didn't ask for this, you can ignore this email.`,
-            }),
-        });
+        try {
+            const configuredFrom = process.env.RESEND_FROM || process.env.MAIL_FROM || "";
+            // Resend cannot send from public free email domains (gmail, yahoo, etc.) without DNS domain ownership verification.
+            const isPublicDomain = /@(gmail|yahoo|hotmail|outlook)\.com/i.test(configuredFrom);
+            const from = (!configuredFrom || isPublicDomain) ? "Syntheboard <onboarding@resend.dev>" : configuredFrom;
+            const res = await fetch("https://api.resend.com/emails", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    from,
+                    to: [to],
+                    subject: "Reset your Syntheboard password",
+                    html,
+                    text: `We received a request to reset your password.\n\nOpen this link (valid for 1 hour):\n${link}\n\nIf you didn't ask for this, you can ignore this email.`,
+                }),
+            });
 
-        if (!res.ok) {
-            const errBody = await res.text();
-            throw new Error(`Resend API error (${res.status}): ${errBody}`);
+            if (!res.ok) {
+                const errBody = await res.text();
+                throw new Error(`Resend API error (${res.status}): ${errBody}`);
+            }
+            console.log(`[mail] Password reset email sent via Resend API to ${to}`);
+            return;
+        } catch (resendErr) {
+            console.warn(`[mail] Resend sending failed: ${resendErr.message}. Attempting SMTP fallback...`);
         }
-        console.log(`[mail] Password reset email sent via Resend API to ${to}`);
-        return;
     }
 
     // 2. Otherwise use SMTP (Nodemailer)
