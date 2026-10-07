@@ -23,6 +23,8 @@ model User {
   phone        String?
   job          String?
   createdAt    DateTime @default(now())
+  resetTokenHash    String?   // sha256 of the emailed password-reset token
+  resetTokenExpires DateTime?
   boards       Board[]
   memberships  BoardMember[]
 }
