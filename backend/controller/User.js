@@ -113,12 +113,18 @@ export const ForgotPassword = async (req, res) => {
                 data: { resetTokenHash: hashToken(token), resetTokenExpires: new Date(Date.now() + 60 * 60 * 1000) },
             });
             const base = process.env.FRONTEND_URL || "http://localhost:3000";
-            await sendPasswordResetEmail(user.email, `${base}/reset-password?token=${token}`);
+            const resetUrl = `${base}/reset-password?token=${token}`;
+            try {
+                await sendPasswordResetEmail(user.email, resetUrl);
+            } catch (mailErr) {
+                console.error("[mail] Failed to send email via mailer:", mailErr.message);
+                console.log(`[mail] Fallback reset link for ${user.email}: ${resetUrl}`);
+            }
         }
         res.status(200).json({ message: "If that email is registered, a reset link has been sent." });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Could not send the reset email. Please try again." });
+        res.status(500).json({ message: "There was an issue processing your request. Please try again." });
     }
 };
 
