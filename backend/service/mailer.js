@@ -30,7 +30,10 @@ export async function sendPasswordResetEmail(to, link) {
 
     // 1. If RESEND_API_KEY is configured, use Resend HTTP API (recommended for Render free tier where SMTP is blocked)
     if (process.env.RESEND_API_KEY) {
-        const from = process.env.MAIL_FROM || "Blank Canvas <onboarding@resend.dev>";
+        const configuredFrom = process.env.RESEND_FROM || process.env.MAIL_FROM || "";
+        // Resend cannot send from public free email domains (gmail, yahoo, etc.) without DNS domain ownership verification.
+        const isPublicDomain = /@(gmail|yahoo|hotmail|outlook)\.com/i.test(configuredFrom);
+        const from = (!configuredFrom || isPublicDomain) ? "Blank Canvas <onboarding@resend.dev>" : configuredFrom;
         const res = await fetch("https://api.resend.com/emails", {
             method: "POST",
             headers: {
