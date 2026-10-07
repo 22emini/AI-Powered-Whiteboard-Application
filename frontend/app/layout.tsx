@@ -6,13 +6,13 @@ import "./globals.css";
 const space = Space_Grotesk({ subsets: ["latin"], variable: "--font-space" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://blankcanvas.app";
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://syntheboard.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Blank Canvas — AI-Powered Infinite Collaborative Whiteboard",
-    template: "%s | Blank Canvas",
+    default: "Syntheboard — AI-Powered Infinite Collaborative Whiteboard",
+    template: "%s | Syntheboard",
   },
   description:
     "Sketch, diagram, and brainstorm on an infinite canvas. Real-time multiplayer collaboration, AI-powered sticky notes, flowcharts, charts, image generation, and built-in video calls.",
@@ -28,9 +28,9 @@ export const metadata: Metadata = {
     "team collaboration",
     "Pollinations AI image whiteboard",
   ],
-  authors: [{ name: "Blank Canvas Team" }],
-  creator: "Blank Canvas",
-  publisher: "Blank Canvas",
+  authors: [{ name: "Syntheboard Team" }],
+  creator: "Syntheboard",
+  publisher: "Syntheboard",
   formatDetection: {
     email: false,
     address: false,
@@ -43,14 +43,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: siteUrl,
-    siteName: "Blank Canvas",
-    title: "Blank Canvas — AI-Powered Infinite Collaborative Whiteboard",
+    siteName: "Syntheboard",
+    title: "Syntheboard — AI-Powered Infinite Collaborative Whiteboard",
     description:
       "Sketch, diagram, and brainstorm on an infinite canvas with real-time collaboration, AI brainstorming, flowcharts, charts, image generation, and video calls.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Blank Canvas — AI-Powered Infinite Collaborative Whiteboard",
+    title: "Syntheboard — AI-Powered Infinite Collaborative Whiteboard",
     description:
       "Sketch, diagram, and brainstorm on an infinite canvas with AI expansion and real-time collaboration.",
   },

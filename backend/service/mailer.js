@@ -22,7 +22,7 @@ function getTransporter() {
 export async function sendPasswordResetEmail(to, link) {
     const html = `<div style="font-family:Arial,sans-serif;max-width:480px">
   <h2>Reset your password</h2>
-  <p>We received a request to reset your Blank Canvas password. This link is valid for 1 hour.</p>
+  <p>We received a request to reset your Syntheboard password. This link is valid for 1 hour.</p>
   <p><a href="${link}" style="display:inline-block;padding:12px 22px;background:#166534;color:#fff;border-radius:8px;text-decoration:none">Reset password</a></p>
   <p style="color:#666;font-size:13px">If the button doesn't work, paste this into your browser:<br>${link}</p>
   <p style="color:#666;font-size:13px">If you didn't ask for this, you can ignore this email.</p>
@@ -33,7 +33,7 @@ export async function sendPasswordResetEmail(to, link) {
         const configuredFrom = process.env.RESEND_FROM || process.env.MAIL_FROM || "";
         // Resend cannot send from public free email domains (gmail, yahoo, etc.) without DNS domain ownership verification.
         const isPublicDomain = /@(gmail|yahoo|hotmail|outlook)\.com/i.test(configuredFrom);
-        const from = (!configuredFrom || isPublicDomain) ? "Blank Canvas <onboarding@resend.dev>" : configuredFrom;
+        const from = (!configuredFrom || isPublicDomain) ? "Syntheboard <onboarding@resend.dev>" : configuredFrom;
         const res = await fetch("https://api.resend.com/emails", {
             method: "POST",
             headers: {
@@ -43,7 +43,7 @@ export async function sendPasswordResetEmail(to, link) {
             body: JSON.stringify({
                 from,
                 to: [to],
-                subject: "Reset your Blank Canvas password",
+                subject: "Reset your Syntheboard password",
                 html,
                 text: `We received a request to reset your password.\n\nOpen this link (valid for 1 hour):\n${link}\n\nIf you didn't ask for this, you can ignore this email.`,
             }),
@@ -65,9 +65,9 @@ export async function sendPasswordResetEmail(to, link) {
     }
 
     await t.sendMail({
-        from: process.env.MAIL_FROM || `"Blank Canvas" <${process.env.SMTP_USER}>`,
+        from: process.env.MAIL_FROM || `"Syntheboard" <${process.env.SMTP_USER}>`,
         to,
-        subject: "Reset your Blank Canvas password",
+        subject: "Reset your Syntheboard password",
         text: `We received a request to reset your password.\n\nOpen this link (valid for 1 hour):\n${link}\n\nIf you didn't ask for this, you can ignore this email.`,
         html,
     });

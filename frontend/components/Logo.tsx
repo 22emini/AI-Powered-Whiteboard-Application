@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export const BRAND = "Blank Canvas";
+export const BRAND = "Syntheboard";
 
 export function Logo({ href = "/" }: { href?: string }) {
   return (

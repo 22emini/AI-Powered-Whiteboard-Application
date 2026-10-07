@@ -3,7 +3,7 @@ import { ResetPasswordForm } from "@/components/ResetPasswordForm";
 
 export const metadata: Metadata = {
   title: "Reset Password",
-  description: "Set a new password for your Blank Canvas account.",
+  description: "Set a new password for your Syntheboard account.",
   robots: { index: false, follow: false },
 };
 

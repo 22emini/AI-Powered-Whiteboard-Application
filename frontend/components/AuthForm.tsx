@@ -92,7 +92,7 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
           {busy ? <span className="spinner" /> : isUp ? "Create account" : "Sign in"}
         </button>
         <p className="auth-foot">
-          {isUp ? <>Already have an account? <Link href="/signin">Sign in</Link></> : <>New to Blank Canvas? <Link href="/signup">Create an account</Link></>}
+          {isUp ? <>Already have an account? <Link href="/signin">Sign in</Link></> : <>New to Syntheboard? <Link href="/signup">Create an account</Link></>}
         </p>
       </form>
     </main>

@@ -6,7 +6,7 @@ import { Maximize2, Minimize2, X } from "lucide-react";
 /** Embedded Jitsi Meet call — one room per board, so everyone on the board joins the same call. */
 export function VideoCall({ boardId, displayName, onClose }: { boardId: string; displayName: string; onClose: () => void }) {
   const [big, setBig] = useState(false);
-  const room = `BlankCanvas-${boardId.replace(/[^a-zA-Z0-9]/g, "")}`;
+  const room = `Syntheboard-${boardId.replace(/[^a-zA-Z0-9]/g, "")}`;
   const hash = [
     `userInfo.displayName=${JSON.stringify(displayName)}`,
     "config.prejoinPageEnabled=false",

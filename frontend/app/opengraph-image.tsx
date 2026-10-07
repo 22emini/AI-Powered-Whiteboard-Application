@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Blank Canvas — AI-Powered Infinite Collaborative Whiteboard";
+export const alt = "Syntheboard — AI-Powered Infinite Collaborative Whiteboard";
 export const size = {
   width: 1200,
   height: 630,
@@ -58,7 +58,7 @@ export default async function Image() {
               letterSpacing: -1,
             }}
           >
-            Blank Canvas
+            Syntheboard
           </span>
         </div>
 

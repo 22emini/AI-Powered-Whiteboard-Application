@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: blank-canvas-backend
+    name: syntheboard-backend
     env: node
     plan: free
     region: oregon
@@ -18,6 +18,8 @@ services:
       - key: GEMINI_API_KEY
         sync: false
       - key: FRONTEND_URL
+        sync: false
+      - key: RESEND_API_KEY
         sync: false
       - key: SMTP_HOST
         sync: false

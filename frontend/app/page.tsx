@@ -71,11 +71,11 @@ const features = [
 
 const faqs = [
   {
-    q: "What is Blank Canvas?",
-    a: "Blank Canvas is an AI-powered infinite whiteboard designed for teams, designers, developers, and educators. It combines real-time multiplayer sketching with AI sticky notes, flowchart generation, AI image creation, and built-in video calls.",
+    q: "What is Syntheboard?",
+    a: "Syntheboard is an AI-powered infinite whiteboard designed for teams, designers, developers, and educators. It combines real-time multiplayer sketching with AI sticky notes, flowchart generation, AI image creation, and built-in video calls.",
   },
   {
-    q: "Is Blank Canvas free to use?",
+    q: "Is Syntheboard free to use?",
     a: "Yes! You can sign up and start whiteboarding immediately for free with no credit card required.",
   },
   {
@@ -97,9 +97,9 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "WebApplication",
-      "@id": "https://blankcanvas.app/#webapp",
-      name: "Blank Canvas",
-      url: "https://blankcanvas.app",
+      "@id": "https://syntheboard.app/#webapp",
+      name: "Syntheboard",
+      url: "https://syntheboard.app",
       applicationCategory: "DesignApplication, BusinessApplication",
       operatingSystem: "All",
       browserRequirements: "Requires modern web browser with HTML5 and WebSockets support",
@@ -121,7 +121,7 @@ const jsonLd = {
     },
     {
       "@type": "FAQPage",
-      "@id": "https://blankcanvas.app/#faq",
+      "@id": "https://syntheboard.app/#faq",
       mainEntity: faqs.map((faq) => ({
         "@type": "Question",
         name: faq.q,
@@ -253,7 +253,7 @@ export default function Home() {
 
         <footer className="footer" role="contentinfo">
           <Logo />
-          <span>© 2026 Blank Canvas. All rights reserved.</span>
+          <span>© 2026 Syntheboard. All rights reserved.</span>
         </footer>
       </div>
     </>
