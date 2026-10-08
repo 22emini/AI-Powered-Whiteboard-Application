@@ -1,12 +1,7 @@
-import fs from "fs";
 import { prisma } from "../src/config/db.js";
 import { getBoardRole, canView, canEdit } from "../utils/boardAccess.js";
 import { emitToBoard } from "../src/config/socket.js";
-import { fileUrl } from "../service/storage.js";
-
-const removeFile = (file) => {
-    if (file) fs.unlink(file.path, () => {});
-};
+import { processUpload } from "../service/storage.js";
 
 // POST /api/boards/:boardId/uploads  (multipart/form-data)
 // fields: image (file), x?, y?
@@ -20,16 +15,16 @@ export const UploadImage = async (req, res) => {
 
         const role = await getBoardRole(boardId, req.userId);
         if (!canView(role)) {
-            removeFile(req.file);
             return res.status(404).json({ message: "Board not found" });
         }
         if (!canEdit(role)) {
-            removeFile(req.file);
             return res.status(403).json({ message: "You have view-only access" });
         }
 
         const x = Number(req.body.x);
         const y = Number(req.body.y);
+
+        const uploaded = await processUpload(req.file, req);
 
         const element = await prisma.element.create({
             data: {
@@ -38,10 +33,13 @@ export const UploadImage = async (req, res) => {
                 x: Number.isFinite(x) ? x : 100,
                 y: Number.isFinite(y) ? y : 100,
                 data: {
-                    url: fileUrl(req, req.file.filename),
-                    originalName: req.file.originalname,
-                    mimeType: req.file.mimetype,
-                    size: req.file.size,
+                    url: uploaded.url,
+                    publicId: uploaded.publicId,
+                    filename: uploaded.filename,
+                    originalName: uploaded.originalName,
+                    mimeType: uploaded.mimeType,
+                    size: uploaded.size,
+                    storage: uploaded.storage,
                 },
             },
         });
@@ -49,8 +47,7 @@ export const UploadImage = async (req, res) => {
         emitToBoard(boardId, "element:created", element);
         res.status(201).json({ message: "Image uploaded", result: element });
     } catch (error) {
-        removeFile(req.file);
-        console.log(error);
+        console.error("Upload error:", error);
         res.status(500).json({ message: "Could not upload image" });
     }
 };

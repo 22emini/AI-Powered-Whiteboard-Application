@@ -1,6 +1,7 @@
 import { prisma } from "../src/config/db.js";
 import { getBoardRole, canView, canEdit } from "../utils/boardAccess.js";
 import { emitToBoard } from "../src/config/socket.js";
+import { deleteFromStorage } from "../service/storage.js";
 
 export const CreateElement = async (req, res) => {
     try {
@@ -95,6 +96,10 @@ export const DeleteElement = async (req, res) => {
         }
 
         await prisma.element.delete({ where: { id: req.params.id } });
+
+        if (existing.type === "image") {
+            deleteFromStorage(existing.data).catch(() => {});
+        }
 
         emitToBoard(existing.boardId, "element:deleted", { id: existing.id });
         res.status(204).send();
