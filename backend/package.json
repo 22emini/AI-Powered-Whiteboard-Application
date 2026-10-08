@@ -4,7 +4,7 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "tsx test-suite.js",
     "start": "tsx server.js",
     "dev": "tsx watch server.js",
     "build": "prisma generate --config prisma7.config.ts",

@@ -50,7 +50,8 @@ export const api = {
   login: (data: { email: string; password: string }) => request<AuthResponse>("/api/auth/login", { method: "POST", body: json(data) }),
 
   forgotPassword: async (email: string) => {
-    const fn = (authClient as any).requestPasswordReset || (authClient as any).forgetPassword;
+    const client = authClient as unknown as Record<string, ((args: unknown) => Promise<{ error?: { message?: string } }>) | undefined>;
+    const fn = client.requestPasswordReset || client.forgetPassword;
     if (typeof fn === "function") {
       const res = await fn({ email, redirectTo: "/reset-password" });
       if (res?.error) {
@@ -62,7 +63,8 @@ export const api = {
   },
 
   resetPassword: async (token: string, password: string) => {
-    const fn = (authClient as any).resetPassword;
+    const client = authClient as unknown as Record<string, ((args: unknown) => Promise<{ error?: { message?: string } }>) | undefined>;
+    const fn = client.resetPassword;
     if (typeof fn === "function") {
       const res = await fn({ newPassword: password, token });
       if (res?.error) {

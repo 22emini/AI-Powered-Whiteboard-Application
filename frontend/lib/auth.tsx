@@ -17,19 +17,22 @@ const Ctx = createContext<AuthCtx | null>(null);
 const USER_KEY = "canvas_user";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window === "undefined") return null;
+    const raw = localStorage.getItem(USER_KEY);
+    if (raw && tokenStore.get()) {
+      try {
+        return JSON.parse(raw) as User;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const raw = localStorage.getItem(USER_KEY);
-    if (raw && tokenStore.get()) {
-      try {
-        setUser(JSON.parse(raw) as User);
-      } catch {
-        /* ignore */
-      }
-    }
-
     authClient
       .getSession()
       .then(({ data }) => {
@@ -41,7 +44,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           };
           setUser(u);
           localStorage.setItem(USER_KEY, JSON.stringify(u));
-          const token = (data as any)?.session?.token || (data as any)?.token;
+          const sessionData = data as unknown as { session?: { token?: string }; token?: string };
+          const token = sessionData?.session?.token || sessionData?.token;
           if (token) tokenStore.set(token);
         } else if (!raw) {
           setUser(null);
@@ -70,7 +74,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(res.error.message || "Invalid email or password");
       }
       const data = res.data;
-      const token = (data as any)?.session?.token || (data as any)?.token;
+      const sessionData = data as unknown as { session?: { token?: string }; token?: string };
+      const token = sessionData?.session?.token || sessionData?.token;
       const u: User = {
         id: data.user.id,
         email: data.user.email,
@@ -102,7 +107,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(res.error.message || "Could not create account");
       }
       const resData = res.data;
-      const token = (resData as any)?.session?.token || (resData as any)?.token;
+      const sessionData = resData as unknown as { session?: { token?: string }; token?: string };
+      const token = sessionData?.session?.token || sessionData?.token;
       const u: User = {
         id: resData.user.id,
         email: resData.user.email,

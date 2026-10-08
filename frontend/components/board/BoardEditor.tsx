@@ -79,7 +79,8 @@ export function BoardEditor({ params }: { params: Promise<{ id: string }> }) {
   const live = useRef({ view, els, selected, canEdit: false, tool });
 
   const isOwner = !!user && !!board && board.ownerId === user.id;
-  const canEdit = role !== null && role !== "viewer";
+  const effectiveRole = role ?? (isOwner ? "owner" : null);
+  const canEdit = effectiveRole !== null && effectiveRole !== "viewer";
   useEffect(() => { live.current = { view, els, selected, canEdit, tool }; });
 
   const setDrag = (d: Drag | null) => { dragRef.current = d; setDragState(d); };
@@ -184,7 +185,6 @@ export function BoardEditor({ params }: { params: Promise<{ id: string }> }) {
     };
   }, [board, boardId, upsert]);
 
-  useEffect(() => { if (board && !role && user && board.ownerId === user.id && !connected) setRole("owner"); }, [board, role, user, connected]);
 
   /* ---------- zoom / wheel ---------- */
   const zoomAt = useCallback((factor: number, cx: number, cy: number) => {
@@ -505,7 +505,7 @@ export function BoardEditor({ params }: { params: Promise<{ id: string }> }) {
           <Link href="/dashboard" className="icon-btn" aria-label="Back to dashboard" id="back-btn"><ArrowLeft size={16} /></Link>
           <h1 className="tb-title">{board.title}</h1>
           <span className={`status-dot ${connected ? "on" : ""}`} title={connected ? "Live" : "Connecting…"} />
-          {role === "viewer" && <span className="pill">View only</span>}
+          {effectiveRole === "viewer" && <span className="pill">View only</span>}
         </div>
         <div className="glass tb-right" style={{ position: "relative" }}>
           <div className="avatars">

@@ -7,9 +7,7 @@ const { Pool } = pg;
 
 export const auth = betterAuth({
   database: new Pool({
-    connectionString:
-      process.env.DATABASE_URL ||
-      "postgresql://neondb_owner:npg_1UkmTnFNPc4v@ep-hidden-butterfly-b4mfk0fw-pooler.c-6.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require",
+    connectionString: process.env.DATABASE_URL,
   }),
   secret: process.env.BETTER_AUTH_SECRET || "syntheboard-better-auth-secure-secret-key-32chars",
   baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
@@ -24,7 +22,7 @@ export const auth = betterAuth({
         return await bcrypt.compare(password, hash);
       },
     },
-    sendResetPassword: async ({ user, url, token }) => {
+    sendResetPassword: async ({ user, url }) => {
       console.log(`[Better Auth] Password reset request for ${user.email}`);
       console.log(`[Better Auth] Reset URL: ${url}`);
     },
