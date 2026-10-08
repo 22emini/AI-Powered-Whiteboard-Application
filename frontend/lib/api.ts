@@ -1,4 +1,5 @@
 import type { Board, BoardElement, ElData, Member, User } from "./types";
+import { authClient } from "./auth-client";
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
 const TOKEN_KEY = "canvas_token";
@@ -47,8 +48,30 @@ interface AuthResponse {
 export const api = {
   signup: (data: Record<string, unknown>) => request<AuthResponse>("/api/auth/signup", { method: "POST", body: json(data) }),
   login: (data: { email: string; password: string }) => request<AuthResponse>("/api/auth/login", { method: "POST", body: json(data) }),
-  forgotPassword: (email: string) => request<{ message: string }>("/api/auth/forgot-password", { method: "POST", body: json({ email }) }),
-  resetPassword: (token: string, password: string) => request<{ message: string }>("/api/auth/reset-password", { method: "POST", body: json({ token, password }) }),
+
+  forgotPassword: async (email: string) => {
+    const fn = (authClient as any).requestPasswordReset || (authClient as any).forgetPassword;
+    if (typeof fn === "function") {
+      const res = await fn({ email, redirectTo: "/reset-password" });
+      if (res?.error) {
+        throw new ApiError(res.error.message || "Failed to request password reset", 400);
+      }
+      return { message: "If that email is registered, a reset link has been sent." };
+    }
+    return request<{ message: string }>("/api/auth/forgot-password", { method: "POST", body: json({ email }) });
+  },
+
+  resetPassword: async (token: string, password: string) => {
+    const fn = (authClient as any).resetPassword;
+    if (typeof fn === "function") {
+      const res = await fn({ newPassword: password, token });
+      if (res?.error) {
+        throw new ApiError(res.error.message || "Invalid or expired token", 400);
+      }
+      return { message: "Password updated. You can now sign in." };
+    }
+    return request<{ message: string }>("/api/auth/reset-password", { method: "POST", body: json({ token, password }) });
+  },
 
   boards: () => request<{ result: Board[] }>("/api/boards").then((r) => r.result),
   createBoard: (title: string) => request<{ result: Board }>("/api/boards", { method: "POST", body: json({ title }) }).then((r) => r.result),

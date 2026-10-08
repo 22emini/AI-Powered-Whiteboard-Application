@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Home } from "lucide-react";
+import { Eye, EyeOff, Home } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
@@ -11,6 +11,7 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
   const { user, ready, login, signup } = useAuth();
   const router = useRouter();
   const [f, setF] = useState({ name: "", email: "", password: "", phone: "", job: "", age: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const isUp = mode === "signup";
@@ -67,7 +68,27 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
         </div>
         <div className="field">
           <label htmlFor="password">Password</label>
-          <input id="password" type="password" required className="input" value={f.password} onChange={set("password")} placeholder={isUp ? "At least 8 characters" : "Your password"} />
+          <div className="password-wrap">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              required
+              className="input"
+              value={f.password}
+              onChange={set("password")}
+              placeholder={isUp ? "At least 8 characters" : "Your password"}
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowPassword((prev) => !prev)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              title={showPassword ? "Hide password" : "Show password"}
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
         {!isUp && <p className="auth-foot" style={{ textAlign: "right", margin: "-4px 0 14px" }}><Link href="/forgot-password" id="forgot-link">Forgot password?</Link></p>}
         {isUp && (

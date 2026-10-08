@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
+import { prisma } from "./db.js";
 import { getBoardRole, canView } from "../../utils/boardAccess.js";
 
 let io = null;
@@ -20,17 +21,38 @@ export const initSocket = (httpServer) => {
         },
     });
 
-    // Every socket must present a valid JWT: io({ auth: { token } })
-    io.use((socket, next) => {
+    // Every socket must present a valid token: io({ auth: { token } })
+    io.use(async (socket, next) => {
         const token = socket.handshake.auth?.token;
         if (!token) return next(new Error("Login required"));
 
         try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            socket.userId = decoded.userId;
-            next();
+            // 1. Check Better Auth active session
+            const session = await prisma.session.findUnique({
+                where: { token },
+                select: { userId: true, expiresAt: true },
+            });
+
+            if (session && new Date(session.expiresAt) > new Date()) {
+                socket.userId = session.userId;
+                return next();
+            }
+
+            // 2. Fallback to JWT verify
+            const secret = process.env.JWT_SECRET || process.env.BETTER_AUTH_SECRET;
+            if (secret) {
+                try {
+                    const decoded = jwt.verify(token, secret);
+                    socket.userId = decoded.userId || decoded.sub;
+                    return next();
+                } catch {
+                    // fall through
+                }
+            }
+
+            return next(new Error("Invalid or expired token"));
         } catch (error) {
-            next(new Error("Invalid or expired token"));
+            return next(new Error("Invalid or expired token"));
         }
     });
 

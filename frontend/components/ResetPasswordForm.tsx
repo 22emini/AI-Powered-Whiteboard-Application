@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState, type FormEvent } from "react";
-import { Home } from "lucide-react";
+import { Eye, EyeOff, Home } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { api } from "@/lib/api";
 
@@ -12,6 +12,8 @@ function Inner() {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
@@ -55,11 +57,51 @@ function Inner() {
             {error && <div className="error-box" role="alert">{error}</div>}
             <div className="field">
               <label htmlFor="password">New password</label>
-              <input id="password" type="password" required className="input" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters" />
+              <div className="password-wrap">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  className="input"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="At least 8 characters"
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  title={showPassword ? "Hide password" : "Show password"}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
             <div className="field">
               <label htmlFor="confirm">Confirm password</label>
-              <input id="confirm" type="password" required className="input" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Repeat password" />
+              <div className="password-wrap">
+                <input
+                  id="confirm"
+                  type={showConfirm ? "text" : "password"}
+                  required
+                  className="input"
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
+                  placeholder="Repeat password"
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowConfirm((prev) => !prev)}
+                  aria-label={showConfirm ? "Hide password" : "Show password"}
+                  title={showConfirm ? "Hide password" : "Show password"}
+                  tabIndex={-1}
+                >
+                  {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
             <button className="btn btn-primary btn-lg" style={{ width: "100%" }} disabled={busy} id="reset-submit">
               {busy ? <span className="spinner" /> : "Update password"}
