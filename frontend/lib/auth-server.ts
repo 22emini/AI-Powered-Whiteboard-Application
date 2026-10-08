@@ -5,9 +5,22 @@ import pg from "pg";
 
 const { Pool } = pg;
 
+const rawDbUrl = process.env.DATABASE_URL;
+
+if (!rawDbUrl) {
+  console.error(
+    "[Better Auth] Missing DATABASE_URL! Ensure DATABASE_URL is set in Vercel Project Settings -> Environment Variables."
+  );
+}
+
+const connectionString = rawDbUrl
+  ? rawDbUrl.replace(/([?&])channel_binding=require(&|$)/, "$1").replace(/[?&]$/, "")
+  : undefined;
+
 export const auth = betterAuth({
   database: new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString,
+    ssl: connectionString && connectionString.includes("neon.tech") ? { rejectUnauthorized: false } : undefined,
   }),
   secret: process.env.BETTER_AUTH_SECRET || "syntheboard-better-auth-secure-secret-key-32chars",
   baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",

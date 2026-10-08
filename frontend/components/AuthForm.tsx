@@ -11,6 +11,7 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
   const { user, ready, login, signup } = useAuth();
   const router = useRouter();
   const [f, setF] = useState({ name: "", email: "", password: "", phone: "", job: "", age: "" });
+  const ageError = f.age !== "" && !/^\d+$/.test(f.age) ? "Age must be a number." : f.age !== "" && (Number(f.age) < 1 || Number(f.age) > 130) ? "Age must be between 1 and 130." : "";
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -26,6 +27,7 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
     e.preventDefault();
     setError("");
     if (isUp && f.password.length < 8) return setError("Password must be at least 8 characters.");
+    if (isUp && ageError) return setError(ageError);
     setBusy(true);
     try {
       if (isUp) {
@@ -100,7 +102,18 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
               </div>
               <div className="field">
                 <label htmlFor="age">Age</label>
-                <input id="age" className="input" value={f.age} onChange={set("age")} placeholder="25" />
+                <input
+                  id="age"
+                  type="number"
+                  inputMode="numeric"
+                  className="input"
+                  value={f.age}
+                  onChange={(e) => setF({ ...f, age: e.target.value.replace(/\D/g, "") })}
+                  placeholder="25"
+                  min={1}
+                  max={130}
+                />
+                {ageError && <span className="error-box" role="alert" style={{ marginTop: 6 }}>{ageError}</span>}
               </div>
             </div>
             <div className="field">
